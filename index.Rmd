@@ -1,0 +1,114 @@
+---
+author: "Marc Gumowski"
+categories:
+- JavaScript
+- R language
+d3: yes
+layout: dbplotSpider
+output: html_document
+css: src/styles.css
+tags:
+- D3
+- Spider Chart
+---
+
+```{r setup, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Install packages
+list.of.packages <- c("readxl", "RODBC", "magrittr", "plyr", "zoo", "data.table", "extrafont", "maps", "ggplot2", 
+                      "ggrepel", "RColorBrewer", "viridis", "dplyr", "sp", "circlize", "gridSVG", "ggiraph",
+                      "htmlwidgets", "shiny", "knitr", "xtable", "jsonlite")
+new.packages     <- list.of.packages[!(list.of.packages %in% installed.packages()[ ,"Package"])]
+if(length(new.packages)) {
+  install.packages(new.packages)
+}
+
+# Load packages
+invisible(lapply(list.of.packages, library, character.only = TRUE))
+
+# Load data                         
+dbdata  <- read_xlsx("data.xlsx")
+
+# Prepare data by Custom Union
+dbplotfull   <- data.table(subset(dbdata, !is.na(Custom_Union)))
+dbplotcustom <- dbplotfull[ ,list(Avg_Product_Tariffs = mean(Avg_Product_Tariffs)), by = list(Custom_Union, 
+                                                                                               Custom_Union_Code,
+                                                                                               Products, 
+                                                                                               Product_Description)]
+# Add World
+dbplotworld <- dbplotfull[ ,list(Avg_Product_Tariffs = mean(Avg_Product_Tariffs),
+                                 Custom_Union = "World Average Profile", Custom_Union_Code = "World"), by = list(Products, 
+                                                                                               Product_Description)]
+# Merge custom union and world
+dbplotgrouped <- rbind(dbplotcustom, dbplotworld)
+
+# Order by Product
+preferedorder <- c(paste0("0",as.character(1:9)), as.character(10:22))
+dbplot        <- dbplotgrouped[preferedorder, on = "Products"]
+dbplot$Products <- as.factor(dbplot$Products)
+
+# Group the custom unions average to have a proper plotting order
+plotorder <- setorder(dbplot[, list(Avg_Product_Tariffs = mean(Avg_Product_Tariffs)), 
+                             by = Custom_Union_Code], -Avg_Product_Tariffs)
+# Merge dbplot and plotorder, then rename the total average column
+dbplot <- merge(dbplot, plotorder, by = "Custom_Union_Code")
+setnames(dbplot, c("Avg_Product_Tariffs.x", "Avg_Product_Tariffs.y"),
+         c("Avg_Product_Tariffs","Total_Avg_Product_Tariffs"))
+# Set Custom Union as Factor and assign them a lvl depending on the total average tariffs
+# dbplot$Custom_Union_Code <- factor(dbplot$Custom_Union_Code, level = plotorder$Custom_Union_Code)
+
+# Prepare data for radarChart.js
+setnames(dbplot, colnames(dbplot), c("id", "name", "product", "description", "value", "average"))
+dbplot[ ,c("value", "average")] <- dbplot[ ,c("value", "average")] / 100 
+
+# Reorder dbplot
+dbplotSpiderdt <- dbplot[order(-average), ]
+
+# dbplot <- dbplot[id == "ANDEAN", ]
+
+dbplotSpider <- lapply(dbplotSpiderdt[ , unique(name)], 
+                       FUN = function(i) { list(key = list(name = unbox(dbplotSpiderdt[name == i, unique(name)]),
+                                                           id = unbox(dbplotSpiderdt[name == i, unique(id)]),
+                                                           average = unbox(dbplotSpiderdt[name == i, unique(average)])), 
+                                                values = data.table(name = dbplotSpiderdt[name == i, name], 
+                                                              id = dbplotSpiderdt[name == i, id], 
+                                                              product = dbplotSpiderdt[name == i, product],
+                                                              description = dbplotSpiderdt[name == i, description],
+                                                              value = dbplotSpiderdt[name == i, value]))})
+
+```
+
+<!-- HTML -->
+<head><title> Spider Chart </title></head>
+<body>
+<center><h1>Custom Union Profile - Average Tariffs by Products</h1></center>
+
+```{r echo = FALSE, results = 'asis'}
+
+# Div Page
+cat('<div class="spiderPage"><table><tr>')
+# Div Checboxes
+cat("
+<th style='text-align:left;vertical-align:top;' nowrap><div class='checkboxes'>", 
+paste0("<input class=myCheckbox type='checkbox' id='checkbox", unique(dbplotSpiderdt$id), "' checked>
+<label for=checkbox", unique(dbplotSpiderdt$id), "><span></span>", unique(dbplotSpiderdt$id), " </label></br>
+"), "</div></th>")
+# Div Chart
+cat('
+<th nowrap><div id="spiderChartInteractive" style="text-align:center; width:100%"></div></th>
+')
+cat('</tr></table></div>')
+# Data, d3, Chart
+cat(
+  paste(
+    '<script>
+    var dbplotSpider = ', toJSON(dbplotSpider, pretty = T), ';
+  </script>'
+  , sep=""),
+'<script src="src/d3v4/d3.min.js"></script>
+<script src="src/radarChart.js"></script>
+<script src="src/spiderChartInteractive.js"></script>
+# ')
+
+```
+</body></html>

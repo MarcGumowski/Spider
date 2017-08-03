@@ -1,0 +1,41 @@
+h1 {
+   color: #666666;
+   font-family: calibri;
+}
+
+.tooltip {   
+  position: absolute;           
+  text-align: left;
+  margin:0;
+  padding: 10px 10px;  
+  font: 12px sans-serif;   
+  font-family: calibri;     
+  background: rgba(218,218,218,0.75);   
+  pointer-events: none; 
+  -webkit-box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.4);
+	-moz-box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.4);
+	box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.4);
+}
+
+table {
+   font-family: calibri;
+   margin-left:0;
+}
+
+input[type="checkbox"] {
+    display:none;
+}
+
+input[type="checkbox"] + label span {
+    display:inline-block;
+    width:18px;
+    height:18px;
+    margin:-2px 4px 0 0;
+    vertical-align:middle;
+    background:url(checkbox_sheet.png) left top no-repeat;
+    cursor:pointer;
+}
+
+input[type="checkbox"]:checked + label span {
+    background:url(checkbox_sheet.png) -19px top no-repeat;
+}
