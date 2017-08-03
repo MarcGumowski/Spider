@@ -5,7 +5,7 @@ Spider implements a spider chart made with D3.js, using the great design created
 
 The data are manipulated using R and then converted into .json format.
 
-The chart represents the average tariffs applied by different custom union on 22 type of products, for the year 2013-2014 (depending on data availability). Trade statistics used to build the dataset come from the World Tariff Profile 2016 publication and can be found in the databases of the WTO, ITC or UNCTAD. More information on the WTO web site: [Statistics](https://www.wto.org/statistics).
+The chart represents the average tariffs applied by different custom unions on 22 types of products, for the year 2013-2014 (depending on data availability). Trade statistics used to build the dataset come from the World Tariff Profile 2016 publication and can be found in the databases of the WTO, ITC or UNCTAD. More information on the WTO web site: [Statistics](https://www.wto.org/statistics).
 
 In order to start playing with data charts:
 
