@@ -54,8 +54,6 @@ plotorder <- setorder(dbplot[, list(Avg_Product_Tariffs = mean(Avg_Product_Tarif
 dbplot <- merge(dbplot, plotorder, by = "Custom_Union_Code")
 setnames(dbplot, c("Avg_Product_Tariffs.x", "Avg_Product_Tariffs.y"),
          c("Avg_Product_Tariffs","Total_Avg_Product_Tariffs"))
-# Set Custom Union as Factor and assign them a lvl depending on the total average tariffs
-# dbplot$Custom_Union_Code <- factor(dbplot$Custom_Union_Code, level = plotorder$Custom_Union_Code)
 
 # Prepare data for radarChart.js
 setnames(dbplot, colnames(dbplot), c("id", "name", "product", "description", "value", "average"))
@@ -63,8 +61,6 @@ dbplot[ ,c("value", "average")] <- dbplot[ ,c("value", "average")] / 100
 
 # Reorder dbplot
 dbplotSpiderdt <- dbplot[order(-average), ]
-
-# dbplot <- dbplot[id == "ANDEAN", ]
 
 dbplotSpider <- lapply(dbplotSpiderdt[ , unique(name)], 
                        FUN = function(i) { list(key = list(name = unbox(dbplotSpiderdt[name == i, unique(name)]),
