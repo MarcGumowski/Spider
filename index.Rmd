@@ -83,9 +83,14 @@ dbplotSpider <- lapply(dbplotSpiderdt[ , unique(name)],
 
 # Div Page
 cat('<div class="spiderPage"><table><tr>')
-# Div Checboxes
+# Div Checkboxes
 cat("
-<th style='text-align:left;vertical-align:top;' nowrap><div class='checkboxes'>", 
+<th style='text-align:left;vertical-align:top;' nowrap>
+<div> 
+<input class=checkboxAll type='checkbox' id='checkboxAll' checked> 
+<label for=checkboxAll><span></span> Select / Deselect All </label><br/>
+</div>
+<div class='checkboxes'>", 
 paste0("<input class=myCheckbox type='checkbox' id='checkbox", unique(dbplotSpiderdt$id), "' checked>
 <label for=checkbox", unique(dbplotSpiderdt$id), "><span></span>", unique(dbplotSpiderdt$id), " </label></br>
 "), "</div></th>")

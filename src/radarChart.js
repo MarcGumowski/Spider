@@ -325,7 +325,28 @@ function RadarChart(id, data, options) {
   d3.selectAll(".myCheckbox")
     .data(data)
     .on("change", checkboxSpider);
-
+    
+  // Select / Deselect All  
+  d3.selectAll('.checkboxAll')
+    .on('change', function() {
+      if(d3.select(this).property("checked")) {
+        
+        for (var i = 0; i < dbplotSpider.length; i++) {
+            if (document.getElementById("checkbox" + dbplotSpider[i].key.id).checked === false) {
+              document.getElementById("checkbox" + dbplotSpider[i].key.id).click();
+            }
+          }
+          
+        } else {
+          
+        for (var j = 0; j < dbplotSpider.length; j++) {
+            if (document.getElementById("checkbox" + dbplotSpider[j].key.id).checked) {
+              document.getElementById("checkbox" + dbplotSpider[j].key.id).click();
+            } 
+          }          
+        }
+    });
+    
 	/////////////////////////////////////////////////////////
 	/////////////////// Helper Function /////////////////////
 	/////////////////////////////////////////////////////////
